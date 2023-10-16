@@ -1,4 +1,4 @@
 
 
 # Ignore tests output dir
-./tests/GPU/output/
+./tests/GPU/output/*

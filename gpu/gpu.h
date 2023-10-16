@@ -1,50 +1,68 @@
 
-/** Gpu related functions: 
- *      Holds all variables and functions related to GPU only
-*/
+/** GPU Related:
+ *      Holds all data related to most abtract part of GPU like platforms, devices, etc ... 
+**/
 
 #ifndef GPU_GPU_H
 #define GPU_GPU_H
 
 /** INCLUDES **/
-#include <CL/cl.h> // OpenCl
+#include <CL/cl.h>
+#include <cstdint>
 
 namespace spyke::gpu {
 
-    // Holds all properties about a specific platform
-    struct Platform_Properties {
+    // Holds all platform information
+    struct Platform_Data {
 
-        // Platform id
-        cl_platform_id id;
+        // Platform Id
+        cl_platform_id platform_id;
+        
+        // Count of all platform device ids
+        uint32_t device_ids_count;
 
-        // Devices information
-        cl_device_id* device_ids; cl_uint number_devices;
-
-    };
-    
-    // Holds all data related to the GPU's 
-    struct Gpu_Properties {
-
-        // Platforms information
-        Platform_Properties* platforms_properties; cl_uint number_platforms;
+        // All platform device ids
+        cl_device_id device_ids; 
 
     };
 
-    extern Gpu_Properties gpu_properties;
+    // Holds all arguments related to most abtract part of GPU like platforms, devices, etc ...
+    struct Gpu_Data {
 
-    // Initiate GPU properties, is mandatory to call this function before any gpu action
-    // @param __print_error If an error occur during the OpenCl Api calls it will be printed
-    bool initiate_gpu_properties( bool __print_error = 0 );
+        // Count of all available platforms
+        uint32_t count_platform_datas;
 
-    // Returns the number of devices available for a specific platform ( GPU's only )
-    // @param __device_id Platform id where the devices will be count 
-    // @param __print_error If an error occur during the OpenCl Api calls it will be printed
-    cl_uint get_available_devices( cl_platform_id, bool __print_error = 0 );
+        // All available platforms
+        Platform_Data* platform_datas;
 
-    // Returns the current number of available platforms ( versions of OpenCl available to use ( OpenCl-nvidia/OpenCl-Amd ... ) )
-    // @param __print_error If an error occur during the OpenCl Api calls it will be printed
-    cl_uint get_available_platforms( bool __print_error = 0 );
+    }; 
+
+    // Global variable holding GPU most abstract data
+    extern Gpu_Data gpu_data;
+
+    // Initial setup to get all GPU abstract data and set it into the global variable
+    // @param __debug If true prints error messages
+    // @return True if all operations work successfully or Fale if not
+    bool setup( bool );
+
+    // Sets all available platforms
+    // @param __debug If true prints error messages
+    // @return True if all operations work successfully or Fale if not
+    bool set_platforms( bool );
+
+    // Sets ids for all available platforms
+    // @param __debug If true prints error messages
+    // @return True if all operations work successfully or Fale if not
+    bool set_device_ids( bool );
+
+    // Checks and handles related open cl api calls errors
+    // @param __function_name Function name where the open cl api call was executed
+    // @param __open_cl_api_function_name Open cl function that was executed
+    // @param __cl_status Open cl api function call status result
+    // @return True if all operations work successfully or Fale if not
+    bool check_handle_errors( const char*, const char*, int32_t );
 
 }
 
 #endif
+

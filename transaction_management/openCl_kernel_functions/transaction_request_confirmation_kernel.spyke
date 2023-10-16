@@ -1,7 +1,0 @@
-kernel void transaction_request_confirmation_kernel( global bool* __is_data_ready) {
-
-    size_t index = get_global_id( 0 );
-
-    printf( "Thread: %d\n", *__is_data_ready );
-
-}
