@@ -1,0 +1,7 @@
+
+
+kernel void try_acquire_thread_kernel() {
+
+    printf("Hey\n");
+
+}
