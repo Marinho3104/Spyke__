@@ -1,0 +1,72 @@
+
+/** DEFINES **/
+
+// Max bit per variable
+#define MAX_BIT_PER_VARIABLE 32
+
+// Number of bytes per Transaction
+#define TRANSACTION_BYTE_SIZE 166
+
+// Will check if everything is correct with the given transaction
+bool check_transaction_request(  ) {
+
+    return 1;
+
+}
+
+// Adds the confirmed transaction request data into the transaction pool
+bool add_transaction_request_to_pool( global void* __transaction_pool, unsigned long __transaction_pool_size ) {
+
+    // Loop throught all transaction pool 
+    for ( unsigned long _ = 0; _ < __transaction_pool_size; _ += TRANSACTION_BYTE_SIZE + 1 ) {
+
+        // Checks for an empty spot
+        if ( ! atomic_cmpxchg( ( global bool* ) __transaction_pool + _, 0, 1 ) ) {
+
+            break;
+
+        }
+
+    }
+
+    return 1;
+
+}
+
+// Entry point to the Transaction Request Proccess kernel functions
+// @param __global_offset Because this kernel can be executed from different devices/platforms this is the offset used in order to obtain always a id for each thread even in different platforms
+// @param __have_work Variable to sinalize to each thread that have new work to proccess
+// @param __transaction_pool Points into the transaction pool
+kernel void transaction_request_proccess_kernel( 
+        unsigned long __global_offset, 
+        global int* __have_work, 
+        global void* __transaction_pool, 
+        unsigned long __transaction_pool_size 
+    ) {
+
+        // Global id of each thread
+        size_t _id = get_global_id( 0 ) + __global_offset;
+
+        // Bit index of each thread
+        size_t _bit_index = get_local_id( 0 );
+
+        // Set the specific varible pointer of current thread
+        global int* _have_work = __have_work + ( _id / MAX_BIT_PER_VARIABLE );
+        
+        // Local variable to check if new work is needed
+        int _have_work_check = 0;
+
+        // Loops forever always checking for new work
+        while( 1 ) {
+
+            // Locks until new work is ready
+            do { _have_work_check = atomic_and( __have_work, 1 << 0 ); } while( ! _have_work_check );
+
+            // Add the confirmed transaction request to the transaction pool
+            add_transaction_request_to_pool( __transaction_pool, __transaction_pool_size ); 
+
+            break;
+
+        }
+
+}

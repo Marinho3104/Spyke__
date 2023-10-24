@@ -1,0 +1,48 @@
+
+/** DEFINES **/
+
+// Max bit per variable
+#define MAX_BIT_PER_VARIABLE 32
+
+// Kernel responsible for trying to acquire a empty transaction_request_proccess_kernel thread to sinalize for new work to proccess 
+// @param __have_work Variable array with all variables used to notify the Transaction Request Proccess threads
+// @param __variables_count Number of variables in the array __have_work 
+kernel void transaction_request_acquire_new_thread_kernel( global int* __have_work, unsigned long __variables_count ) {
+
+    // Holds the current value of the variable in check
+    int _current_value, _empty_bit_index;
+
+    // Loop through all variables
+    for( unsigned long _ = 0; _ < __variables_count; _++ ) {
+
+        // Infinity loop, cause it can happens that when the value is going to be set already may been happen in the variable 
+        // this can happen cause a thread finishes is work and sinalize that is open for new work, or even another if another kernel like this open
+        // was launch and already made a change in this current variable
+        while( 1 ) {
+
+            // Get the current value of variable sign
+            _current_value = atomic_and( __have_work + _, 0xffffffff );
+
+            // If variable is full meaning all bits are set to 1,
+            // goes to the next variable in the array
+            if ( _current_value == 0xffffffff ) break;
+
+            // If is not full 
+
+            // Get the bit index that is empty
+            // The for condition is never met cause of the previous comparation
+            for ( _empty_bit_index = 0; _empty_bit_index < MAX_BIT_PER_VARIABLE; _empty_bit_index++ )
+
+                // Makes the right shift and check the first bit is 0
+                if ( ( _current_value << _empty_bit_index ) & 0x01 ) break;
+
+            // Attemps to change the variable value to the new one
+            if ( atomic_cmpxchg( __have_work + _, _current_value, _current_value | ( 1 << _empty_bit_index ) ) == _current_value ) 
+
+                return;
+
+        }
+
+    }
+
+}
