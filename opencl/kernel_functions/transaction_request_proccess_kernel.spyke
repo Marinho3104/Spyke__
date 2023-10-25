@@ -1,7 +1,0 @@
-
-
-kernel void transaction_request_proccess_kernel() {
-
-    printf( "Hey " );
-
-}

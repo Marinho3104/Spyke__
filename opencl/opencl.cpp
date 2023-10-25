@@ -131,3 +131,72 @@ bool spyke::opencl::set_kernel(
         return ! spyke::helper::check_handle_open_cl_api_errors( __information, "clCreateKernel", _cl_status, _build_log );
         
 }
+
+bool spyke::opencl::set_buffer( cl_mem* __memory, cl_context __context, cl_mem_flags __memory_flags, size_t __memory_size, const char* __information ) {
+
+    // Catch errors
+    cl_int _cl_status;
+
+    // Creates and sets the buffer
+    *__memory = 
+        clCreateBuffer(
+            __context,
+            __memory_flags,
+            __memory_size,
+            0,
+            &_cl_status
+        );
+    
+    // Check for error
+    return ! spyke::helper::check_handle_open_cl_api_errors( __information, "clCreateBuffer", _cl_status );
+    
+}
+
+bool spyke::opencl::set_kernel_argument( cl_kernel __kernel, uint32_t __kernel_argument_index, size_t __argument_size, void* __argument_value, const char* __information ) {
+
+    // Set the kernel argument
+    cl_int _cl_status = 
+        clSetKernelArg(
+            __kernel,
+            __kernel_argument_index,
+            __argument_size,
+            __argument_value
+        );
+
+    // Check for error
+    return ! spyke::helper::check_handle_open_cl_api_errors( __information, "spyke::opencl::set_kernel_argument", _cl_status );
+  
+}
+
+bool spyke::opencl::launch_kernel( cl_command_queue __command_queue, cl_kernel __kernel, size_t __global_size, size_t __local_size, const char* __information ) {
+
+    // Launch the kernel
+    cl_int _cl_status = 
+        clEnqueueNDRangeKernel(
+            __command_queue,
+            __kernel,
+            1, 0,
+            &__global_size,
+            &__local_size,
+            0, 0, 0 
+        );
+
+    // Check for error
+    return ! spyke::helper::check_handle_open_cl_api_errors( __information, "clEnqueueNDRangeKernel", _cl_status );
+    
+}
+
+bool spyke::opencl::launch_kernel( cl_command_queue __command_queue, cl_kernel __kernel, const char* __information ) {
+
+    // Launch the kernel
+    cl_int _cl_status = 
+        clEnqueueTask(
+            __command_queue,
+            __kernel,
+            0, 0, 0 
+        );
+
+    // Check for error
+    return ! spyke::helper::check_handle_open_cl_api_errors( __information, "clEnqueueNDRangeKernel", _cl_status );
+
+}

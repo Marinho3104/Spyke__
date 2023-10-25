@@ -16,6 +16,8 @@ int main() {
 
     // User settings
 
+    size_t __threads_per_device_id[ 1 ] = { 32 }; 
+
     spyke::transaction_management::user_settings.type = 
         TRANSACTION_MANAGEMENT_TRANSACTION_MANAGEMENT_DEFINES_H_MINER_SETUP;
 
@@ -28,6 +30,9 @@ int main() {
 
     spyke::transaction_management::user_settings.platforms[ 0 ].device_ids_transaction_request_proccess_count = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids_count;
     spyke::transaction_management::user_settings.platforms[ 0 ].device_ids_transaction_request_proccess = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids;
+    spyke::transaction_management::user_settings.platforms[ 0 ].transaction_request_proccess_threads_count = __threads_per_device_id;
+
+    spyke::transaction_management::user_settings.platforms[ 0 ].device_id_acquire_thread = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids[ 0 ];
 
 
     spyke::transaction_management::user_settings.platforms[ 1 ].device_ids_count = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids_count;
@@ -35,9 +40,16 @@ int main() {
     
     spyke::transaction_management::user_settings.platforms[ 1 ].device_ids_transaction_request_proccess_count = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids_count;
     spyke::transaction_management::user_settings.platforms[ 1 ].device_ids_transaction_request_proccess = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids;
+    spyke::transaction_management::user_settings.platforms[ 1 ].transaction_request_proccess_threads_count = __threads_per_device_id;
+
+    spyke::transaction_management::user_settings.platforms[ 1 ].device_id_acquire_thread = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids[ 0 ];
 
     // Transaction Management Setup
     if ( ! spyke::transaction_management::setup() ) return 0;
+
+    std::cout << "Setup done" << std::endl;
+
+    if ( ! spyke::transaction_management::start_kernels() ) return 0;
 
 }
 

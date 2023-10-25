@@ -1,6 +1,6 @@
 
 
-open_cl_kernel_functions_path = ./../../opencl/kernel_functions/
+transaction_management_open_cl_kernel_functions_path = ./../../transaction_management/opencl_functions/
 transaction_management_path := ./../../transaction_management/
 open_cl_path = ./../../opencl/
 helper_path := ./../../helper/
@@ -19,8 +19,8 @@ all:
 	# Main file
 	cp *.cpp $(output_file_path)
 
-	# Kernel functions
-	cp $(open_cl_kernel_functions_path)*.spyke $(output_file_path)
+	# Transaction Management Kernel functions
+	cp $(transaction_management_open_cl_kernel_functions_path)*.spyke $(output_file_path)
 
 	# Opencl functions
 	cp $(open_cl_path)*.cpp $(open_cl_path)*.h $(output_file_path)

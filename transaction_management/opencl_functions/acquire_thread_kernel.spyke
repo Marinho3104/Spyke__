@@ -6,14 +6,14 @@
 
 // Kernel responsible for trying to acquire a empty transaction_request_proccess_kernel thread to sinalize for new work to proccess 
 // @param __have_work Variable array with all variables used to notify the Transaction Request Proccess threads
-// @param __variables_count Number of variables in the array __have_work 
-kernel void transaction_request_acquire_new_thread_kernel( global int* __have_work, unsigned long __variables_count ) {
+// @param __have_work_variables_count Number of variables in the array __have_work 
+kernel void acquire_thread_kernel( global int* __have_work, unsigned long __have_work_variables_count ) {
 
     // Holds the current value of the variable in check
     int _current_value, _empty_bit_index;
 
     // Loop through all variables
-    for( unsigned long _ = 0; _ < __variables_count; _++ ) {
+    for( unsigned long _ = 0; _ < __have_work_variables_count; _++ ) {
 
         // Infinity loop, cause it can happens that when the value is going to be set already may been happen in the variable 
         // this can happen cause a thread finishes is work and sinalize that is open for new work, or even another if another kernel like this open
@@ -31,7 +31,7 @@ kernel void transaction_request_acquire_new_thread_kernel( global int* __have_wo
 
             // Get the bit index that is empty
             // The for condition is never met cause of the previous comparation
-            for ( _empty_bit_index = 0; _empty_bit_index < MAX_BIT_PER_VARIABLE; _empty_bit_index++ )
+            for ( _empty_bit_index = 0; _empty_bit_index < sizeof( *__have_work ); _empty_bit_index++ )
 
                 // Makes the right shift and check the first bit is 0
                 if ( ( _current_value << _empty_bit_index ) & 0x01 ) break;
