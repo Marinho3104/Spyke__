@@ -1,6 +1,6 @@
 
 /** INCLUDES **/
-#include "gpu_defines.h"
+#include "helper.h"
 #include "gpu.h"
 
 #include <iostream>
@@ -35,7 +35,7 @@ bool spyke::gpu::set_platforms() {
         );
 
     // Check for error
-    if ( check_handle_errors( "spyke::gpu::set_platforms", "clGetPlatformIDs", _cl_status ) ) return 0;
+    if ( spyke::helper::check_handle_open_cl_api_errors( "spyke::gpu::set_platforms", "clGetPlatformIDs", _cl_status ) ) return 0;
 
     // Temporary stack memory for holding all data related to platform 
     cl_platform_id platform_ids[ gpu_data.count_platform_datas ];
@@ -49,7 +49,7 @@ bool spyke::gpu::set_platforms() {
         );
 
     // Check for error
-    if ( check_handle_errors( "spyke::gpu::set_platforms", "clGetPlatformIDs", _cl_status ) ) return 0;
+    if ( spyke::helper::check_handle_open_cl_api_errors( "spyke::gpu::set_platforms", "clGetPlatformIDs", _cl_status ) ) return 0;
 
     // Allocate memory for all available platforms
     gpu_data.platform_datas = 
@@ -85,7 +85,7 @@ bool spyke::gpu::set_device_ids() {
             );
 
         // Check for error
-        if ( check_handle_errors( "spyke::gpu::set_device_ids", "clGetDeviceIDs", _cl_status ) ) return 0;
+        if ( spyke::helper::check_handle_open_cl_api_errors( "spyke::gpu::set_device_ids", "clGetDeviceIDs", _cl_status ) ) return 0;
 
         // allocates memory for all device ids
         gpu_data.platform_datas[ _ ].device_ids = 
@@ -102,7 +102,7 @@ bool spyke::gpu::set_device_ids() {
             );
 
         // Check for error
-        if ( check_handle_errors( "spyke::gpu::set_device_ids", "clGetDeviceIDs", _cl_status ) ) return 0;
+        if ( spyke::helper::check_handle_open_cl_api_errors( "spyke::gpu::set_device_ids", "clGetDeviceIDs", _cl_status ) ) return 0;
 
     }
 
@@ -111,23 +111,4 @@ bool spyke::gpu::set_device_ids() {
 
 }
 
-bool spyke::gpu::check_handle_errors( const char* __function_name, const char* __open_cl_api_function_name, int32_t __cl_status ) {
 
-    // Check for errors
-    if ( __cl_status != CL_SUCCESS ) {
-
-        // If is define the macro for printing the error
-        #ifdef GPU_GPU_DEFINES_H_PRINT_ERROR_INFORMATION
-
-            // Prin error message
-            std::cout << __function_name << "(): An occur during " << __open_cl_api_function_name << "() api call with error: " << __cl_status << std::endl;
-
-        #endif
-
-        return 1;
-
-    }
-
-    return 0;
-
-}

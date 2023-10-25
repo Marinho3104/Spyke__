@@ -1,4 +1,6 @@
 
+# Ignore vscode config file
+/.vscode
 
 # Ignore tests output dir
 ./tests/GPU/output/*

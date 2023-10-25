@@ -1,0 +1,7 @@
+
+
+kernel void transaction_pool_get_transactions_kernel( global void* __transaction_pool, global void* __store_at ) {
+
+    *( global bool* ) __store_at = atomic_and( ( global bool* ) __transaction_pool, 0xff );
+
+}

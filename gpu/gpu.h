@@ -41,26 +41,16 @@ namespace spyke::gpu {
     extern Gpu_Data gpu_data;
 
     // Initial setup to get all GPU abstract data and set it into the global variable
-    // @param __debug If true prints error messages
-    // @return True if all operations work successfully or Fale if not
+    // @return True if all operations work successfully or False if not
     bool setup();
 
     // Sets all available platforms
-    // @param __debug If true prints error messages
-    // @return True if all operations work successfully or Fale if not
+    // @return True if all operations work successfully or False if not
     bool set_platforms();
 
     // Sets ids for all available platforms
-    // @param __debug If true prints error messages
-    // @return True if all operations work successfully or Fale if not
+    // @return True if all operations work successfully or False if not
     bool set_device_ids();
-
-    // Checks and handles related open cl api calls errors
-    // @param __function_name Function name where the open cl api call was executed
-    // @param __open_cl_api_function_name Open cl function that was executed
-    // @param __cl_status Open cl api function call status result
-    // @return True if an error occur during the calls, or False if not
-    bool check_handle_errors( const char*, const char*, int32_t );
 
 }
 
