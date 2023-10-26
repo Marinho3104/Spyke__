@@ -47,9 +47,14 @@ int main() {
     // Transaction Management Setup
     if ( ! spyke::transaction_management::setup() ) return 0;
 
-    std::cout << "Setup done" << std::endl;
+    // std::cout << "Setup done" << std::endl;
 
     if ( ! spyke::transaction_management::start_kernels() ) return 0;
+
+    // std::cout << "Start done" << std::endl;
+    sleep( 6 );
+
+    spyke::transaction_management::add_new_transaction_request( 0 );
 
 }
 

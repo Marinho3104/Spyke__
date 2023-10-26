@@ -26,11 +26,9 @@ kernel void transaction_request_proccess_kernel(
 
         // Waits for the signal to new proccess 
         wait_for_signal( 
-            __have_work + ( get_global_id( 0 ) / sizeof( *__have_work ) ), 
+            __have_work, //  + ( get_global_id( 0 ) / ( sizeof( *__have_work ) * 8 ) ), 
             get_local_id( 0 ) 
         );
-
-        printf( "Hey" );
 
         break;
 

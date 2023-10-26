@@ -155,7 +155,7 @@ bool spyke::transaction_management::transaction_request_proccess_kernel_setup( u
                 gpu_variables_data.platforms[ __platform_index ].transaction_request_proccess_command_queue + _,
                 gpu_variables_data.platforms[ __platform_index ].context,
                 user_settings.platforms[ __platform_index ].device_ids_transaction_request_proccess[ _ ],
-                CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+                0, // CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
                 "spyke::transaction_management::transaction_request_proccess_kernel_setup"
             ) 
         ) return 0;
@@ -234,7 +234,7 @@ bool spyke::transaction_management::acquire_thread_kernel_setup( uint32_t __plat
             &gpu_variables_data.platforms[ __platform_index ].acquire_thread_command_queue,
             gpu_variables_data.platforms[ __platform_index ].context,
             user_settings.platforms[ __platform_index ].device_id_acquire_thread,
-            CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+            0, // CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
             "spyke::transaction_management::acquire_thread_kernel_setup"
         )
     ) return 0;
@@ -311,6 +311,8 @@ bool spyke::transaction_management::add_new_transaction_request( void* __data ) 
             )
         ) return 0;
 
+        clFinish( gpu_variables_data.platforms[ _ ].transaction_request_proccess_command_queue[ 0 ] );
+
         break;
 
     }
@@ -318,4 +320,5 @@ bool spyke::transaction_management::add_new_transaction_request( void* __data ) 
     return 1;
 
 }
+
 
