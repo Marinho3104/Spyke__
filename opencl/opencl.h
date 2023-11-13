@@ -67,6 +67,16 @@ namespace spyke::opencl {
     // @param __information
     bool launch_kernel( cl_command_queue, cl_kernel, const char* );
 
+    // Enqueues a read to a gpu memory buffer and reads the value into a given variable
+    // @param __command_queue
+    // @param __buffer
+    // @param __block
+    // @param __offset
+    // @param __size
+    // @param __to
+    // @param __information
+    bool read_buffer( cl_command_queue, cl_mem, cl_bool, size_t, size_t, void*, const char* );
+
 }
 
 #endif

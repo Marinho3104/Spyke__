@@ -54,7 +54,7 @@ int main() {
     // std::cout << "Start done" << std::endl;
     sleep( 6 );
 
-    spyke::transaction_management::add_new_transaction_request( 0 );
+    spyke::transaction_management::add_new_transaction_request( 0, 0 );
 
 }
 

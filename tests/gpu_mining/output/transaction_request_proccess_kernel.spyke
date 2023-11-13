@@ -9,7 +9,7 @@ void wait_for_signal( global int* __have_work, size_t __bit_index ) {
     int _have_work_check;
 
     // Locks until the bit is 1
-    do { _have_work_check = atomic_and( __have_work, 1 << __bit_index ); } while( ! _have_work_check );
+    do { _have_work_check = atomic_and( __have_work, 1 << 0 ); } while( ! _have_work_check );
 
 }
 
@@ -18,7 +18,8 @@ void wait_for_signal( global int* __have_work, size_t __bit_index ) {
 // @param __have_work Variable to sinalize to each thread that have new work to proccess
 kernel void transaction_request_proccess_kernel(
     unsigned long __global_offset,
-    global int* __have_work
+    global int* __have_work,
+    global unsigned long* __work_data
 ) {
 
     // Infity loop to always proccess new transactions

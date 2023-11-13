@@ -1,2 +1,7 @@
 
 Implement the Transaction Management for diferent context <-
+
+Remove unnecessary Kernel_Arguments variables from global memory space like global_offset_kernel_argument
+
+Remove global keyword from unnecessary kernels
+

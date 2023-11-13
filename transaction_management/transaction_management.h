@@ -54,6 +54,9 @@ namespace spyke::transaction_management {
         // Platforms and respective data involve in each 
         User_Settings_Platform_Only* platforms; uint32_t platforms_count;
 
+        // Number of transacions used in the transacion pool
+        uint64_t number_transactions_pool;
+
     };
 
     // Holds gpu data about each platform
@@ -93,9 +96,17 @@ namespace spyke::transaction_management {
         // we divide it by 32 to have the amount of variables needed to be allocated to serve every thread in ( int - 4 bytes - 32 bits ) 
         Kernel_Argument have_work_kernel_argument;
 
+        // __work_data - Used in transaction_request_proccess_kernel, acquire_thread_kernel
+        // Used to store and then be used in Transaction Request Proccess kernel threads
+        // Its an array of pointer each one is set to null meaninig there is no new transactions to proccess
+        // when new transactions came to be proccess are then allocated in a new memory spot and the address of that spot copied into this array
+        // the reason why i choose to set the variables as unsigned long* is because the kernel arguments cannot be double pointer
+        Kernel_Argument work_data_kernel_argument;
+
         // __variables_count - Used in acquire_thread_kernel
         // Used to make the thread know how much variable is there in total in the __have_work int array
         Kernel_Argument have_work_variables_count_kernel_argument;
+
 
     };
 
@@ -139,8 +150,10 @@ namespace spyke::transaction_management {
 
 
     // Adds a new transaction request into the active kernels for proccessing
+    // the transaction data should already be confirmed about its integraty
     // @param __data Transaction Request data
-    bool add_new_transaction_request( void* );
+    // @param __data_size Size of Transaction Request data
+    bool add_new_transaction_request( void*, uint64_t );
 
 }
 
