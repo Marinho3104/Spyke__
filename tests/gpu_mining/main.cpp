@@ -31,6 +31,7 @@ int main() {
     spyke::transaction_management::user_settings.platforms[ 0 ].device_ids_transaction_request_proccess_count = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids_count;
     spyke::transaction_management::user_settings.platforms[ 0 ].device_ids_transaction_request_proccess = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids;
     spyke::transaction_management::user_settings.platforms[ 0 ].transaction_request_proccess_threads_count = __threads_per_device_id;
+    spyke::transaction_management::user_settings.platforms[ 0 ].transaction_request_proccesseds_count = 10;
 
     spyke::transaction_management::user_settings.platforms[ 0 ].device_id_acquire_thread = spyke::gpu::gpu_data.platform_datas[ 0 ].device_ids[ 0 ];
 
@@ -41,6 +42,7 @@ int main() {
     spyke::transaction_management::user_settings.platforms[ 1 ].device_ids_transaction_request_proccess_count = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids_count;
     spyke::transaction_management::user_settings.platforms[ 1 ].device_ids_transaction_request_proccess = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids;
     spyke::transaction_management::user_settings.platforms[ 1 ].transaction_request_proccess_threads_count = __threads_per_device_id;
+    spyke::transaction_management::user_settings.platforms[ 1 ].transaction_request_proccesseds_count = 10;
 
     spyke::transaction_management::user_settings.platforms[ 1 ].device_id_acquire_thread = spyke::gpu::gpu_data.platform_datas[ 1 ].device_ids[ 0 ];
 
@@ -51,10 +53,16 @@ int main() {
 
     if ( ! spyke::transaction_management::start_kernels() ) return 0;
 
-    // std::cout << "Start done" << std::endl;
-    sleep( 6 );
+    // // std::cout << "Start done" << std::endl;
+    sleep( 3 );
 
-    spyke::transaction_management::add_new_transaction_request( 0, 0 );
+    int p = 1011;
+
+    spyke::transaction_management::add_new_transaction_request( &p, 4 );
+
+    // if ( ! spyke::transaction_management::start_kernels() ) return 0;
+
+    return 1;
 
 }
 

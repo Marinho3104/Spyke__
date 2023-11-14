@@ -2,7 +2,6 @@
 /** INCLUDES **/
 #include "transaction_management_defines.h"
 #include "transaction_management.h"
-#include "transaction_pool.h"
 #include "opencl.h"
 #include "helper.h"
 
@@ -94,10 +93,7 @@ bool spyke::transaction_management::start_transaction_request_proccess_kernel( u
 bool spyke::transaction_management::setup() {
 
     // Global setup ( needed for all types )
-    if (
-        ! spyke::transaction_management::transaction_pool::setup()
-    ) return 0;
-
+    
     // Miners setup
     if ( 
         user_settings.type == TRANSACTION_MANAGEMENT_TRANSACTION_MANAGEMENT_DEFINES_H_MINER_SETUP &&  
@@ -261,6 +257,48 @@ bool spyke::transaction_management::transaction_request_proccess_kernel_setup( u
         )
     ) return 0;
 
+    cl_mem _temp_pool_kernel_argument;
+
+    if (
+        ! spyke::opencl::set_buffer(
+            &_temp_pool_kernel_argument,
+            gpu_variables_data.platforms[ __platform_index ].context,
+            CL_MEM_READ_WRITE,
+            user_settings.platforms[ __platform_index ].transaction_request_proccesseds_count,
+            "spyke::transaction_management::transaction_request_proccess_kernel_setup"
+        )
+    ) return 0;
+
+    // __pool kernel argument
+    gpu_variables_data.platforms[ __platform_index ].pool_kernel_argument = 
+        Kernel_Argument(
+            sizeof( void* ),
+            &_temp_pool_kernel_argument
+        );
+
+    // Set the argument into the kernel arguments
+    if (
+        ! spyke::opencl::set_kernel_argument(
+            gpu_variables_data.platforms[ __platform_index ].transaction_request_proccess_kernel,
+            3,
+            gpu_variables_data.platforms[ __platform_index ].pool_kernel_argument.argument_size,
+            gpu_variables_data.platforms[ __platform_index ].pool_kernel_argument.argument,
+            "spyke::transaction_management::transaction_request_proccess_kernel_setup"
+        )
+    ) return 0;
+
+    // __pool_size argument
+    if (
+        ! spyke::opencl::set_kernel_argument(
+            gpu_variables_data.platforms[ __platform_index ].transaction_request_proccess_kernel,
+            4,
+            sizeof( cl_ulong ),
+            &user_settings.platforms[ __platform_index ].transaction_request_proccesseds_count,
+            "spyke::transaction_management::transaction_request_proccess_kernel_setup"
+        )
+    ) return 0;
+
+
     return 1;
 
 }
@@ -346,6 +384,52 @@ bool spyke::transaction_management::add_new_transaction_request( void* __data, u
     // Loops throught each platform
     for ( uint32_t _ = 0; _ < gpu_variables_data.platforms_count; _++ ) {
 
+        // Sets the Transaction Request threads memory into the kernel argument
+        if (
+            ! spyke::opencl::set_kernel_argument(
+                gpu_variables_data.platforms[ _ ].acquire_thread_kernel,
+                3,
+                gpu_variables_data.platforms[ _ ].work_data_kernel_argument.argument_size,
+                gpu_variables_data.platforms[ _ ].work_data_kernel_argument.argument,
+                "spyke::transaction_management::add_new_transaction_request"
+            )
+        ) return 0;
+
+        // Allocate the buffer to the _transaction_request_data variable
+        if (
+            ! spyke::opencl::set_buffer(
+                &_transaction_request_data,
+                gpu_variables_data.platforms[ _ ].context,
+                CL_MEM_READ_WRITE,
+                __data_size,
+                "spyke::transaction_management::add_new_transaction_request"
+            )
+        ) return 0;
+
+        // Write the transaction data into the gpu memory
+        if (
+            ! spyke::opencl::write_buffer(
+                gpu_variables_data.platforms[ _ ].acquire_thread_command_queue,
+                _transaction_request_data,
+                CL_TRUE,
+                0,
+                __data_size,
+                __data,
+                "spyke::transaction_management::add_new_transaction_request"                
+            )
+        ) return 0;
+
+        // Set as Kernel argument
+        if (
+            ! spyke::opencl::set_kernel_argument(
+                gpu_variables_data.platforms[ _ ].acquire_thread_kernel,
+                2,
+                sizeof( void* ),
+                &_transaction_request_data,
+                "spyke::transaction_management::add_new_transaction_request"
+            )
+        ) return 0;
+
         // Allocate the buffer to the _acquire_status variable
         if (
             ! spyke::opencl::set_buffer(
@@ -361,7 +445,7 @@ bool spyke::transaction_management::add_new_transaction_request( void* __data, u
         if (
             ! spyke::opencl::set_kernel_argument(
                 gpu_variables_data.platforms[ _ ].acquire_thread_kernel,
-                2,
+                4,
                 sizeof( cl_bool* ),
                 &_acquire_status,
                 "spyke::transaction_management::add_new_transaction_request"
@@ -396,15 +480,15 @@ bool spyke::transaction_management::add_new_transaction_request( void* __data, u
             )
         ) return 0;
 
-        std::cout << "Value: " << _acquire_status_cpu << std::endl;
-
         clFinish( gpu_variables_data.platforms[ _ ].transaction_request_proccess_command_queue[ 0 ] );
 
-        break;
+        // If the acquire was made successfully exit the loop 
+        if ( _acquire_status ) return 1;
 
     }
 
-    return 1;
+    // There was no available threads 
+    return 0;
 
 }
 

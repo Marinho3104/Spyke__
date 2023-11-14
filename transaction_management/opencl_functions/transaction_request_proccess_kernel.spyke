@@ -1,5 +1,13 @@
 
 
+// Proccesses a transaction request data
+// @return True if the transaction is valid or false if not
+bool proccess_transaction_request( void* __transaction_request_data ) {
+
+    return 1;
+
+}
+
 // Locks until the signal is given that a new Transaction Request is ready for proccess
 // @param __have_work
 // @param __bit_index
@@ -19,8 +27,13 @@ void wait_for_signal( global int* __have_work, size_t __bit_index ) {
 kernel void transaction_request_proccess_kernel(
     unsigned long __global_offset,
     global int* __have_work,
-    global unsigned long* __work_data
+    global unsigned long* __work_data,
+    global void* __pool,
+    unsigned long __pool_transactions_count
 ) {
+
+    // Unique  identification
+    unsigned long _unique_id = get_global_id( 0 ) + __global_offset;
 
     // Infity loop to always proccess new transactions
     while( 1 ) {
@@ -30,6 +43,13 @@ kernel void transaction_request_proccess_kernel(
             __have_work, //  + ( get_global_id( 0 ) / ( sizeof( *__have_work ) * 8 ) ), 
             get_local_id( 0 ) 
         );
+
+        // Proccesses the Transaction Request Data
+        if ( proccess_transaction_request( ( void* ) *( __work_data + _unique_id ) ) ) {
+
+            // If transaction is valid
+
+        }
 
         break;
 

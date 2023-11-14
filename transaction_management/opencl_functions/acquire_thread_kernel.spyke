@@ -10,6 +10,8 @@
 kernel void acquire_thread_kernel( 
     global int* __have_work, 
     unsigned long __have_work_variables_count,
+    global void* __data,
+    global unsigned long* __threads_memory,
     global bool* __acquire_status
 ) {
     
@@ -45,7 +47,11 @@ kernel void acquire_thread_kernel(
             
                 // If the change was successful exit the loop            
 
-                // Sinalize back thaty the acquire was made successfuly
+                // Copy the data pointer into the thread specific memory spot 
+                *( __threads_memory + ( 32 * _ ) + _empty_bit_index ) = 
+                    ( unsigned long ) __data;
+
+                // Sinalize back that the acquire was made successfuly
                 *__acquire_status = 1;
 
                 return;

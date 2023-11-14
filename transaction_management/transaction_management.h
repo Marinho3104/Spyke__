@@ -37,6 +37,9 @@ namespace spyke::transaction_management {
         // Device ids used in Transaction Request Proccess Kernels
         cl_device_id* device_ids_transaction_request_proccess; uint32_t device_ids_transaction_request_proccess_count;
 
+        // Number of spots to store transactions in each platform
+        size_t transaction_request_proccesseds_count;
+
         // Number of threads used in each device id for the Transaction Request Proccess Kernel
         size_t* transaction_request_proccess_threads_count;
 
@@ -107,6 +110,9 @@ namespace spyke::transaction_management {
         // Used to make the thread know how much variable is there in total in the __have_work int array
         Kernel_Argument have_work_variables_count_kernel_argument;
 
+        // __pool - Used in transaction_request_proccess_kernel
+        // Used to stored the already proccesseds Transaction Requests
+        Kernel_Argument pool_kernel_argument;
 
     };
 

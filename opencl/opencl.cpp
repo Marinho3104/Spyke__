@@ -228,3 +228,29 @@ bool spyke::opencl::read_buffer(
 
 }
 
+bool spyke::opencl::write_buffer( 
+    cl_command_queue __command_queue, 
+    cl_mem __buffer, 
+    cl_bool __block, 
+    size_t __offset, 
+    size_t __size, 
+    void* __data, 
+    const char* __information ) {
+    
+        // Enqueues the read to the buffer
+        cl_int _cl_status = clEnqueueWriteBuffer(
+            __command_queue,
+            __buffer,
+            __block,
+            __offset,
+            __size,
+            __data,
+            0,
+            0,
+            0
+        );
+
+        // Check for error
+        return ! spyke::helper::check_handle_open_cl_api_errors( __information, "clEnqueueWriteBuffer", _cl_status );
+
+}
