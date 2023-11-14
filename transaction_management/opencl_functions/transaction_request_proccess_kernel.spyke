@@ -21,6 +21,25 @@ void wait_for_signal( global int* __have_work, size_t __bit_index ) {
 
 }
 
+// Saves the transaction data into the pool
+// @param __transaction_data
+// @param __pool
+// @param __pool_size
+void store_transaction_data( 
+    void* __transaction_data, 
+    global void* __pool, 
+    unsigned long __pool_transactions_count 
+) {
+
+    // Loops throuht the pool size
+    for ( unsigned long _ = 0; _ < __pool_transactions_count; _++ ) {
+
+
+
+    }
+
+}
+
 // Entry point to the Transaction Request Proccess kernel functions
 // @param __global_offset Because this kernel can be executed from different devices this is the offset used in order to obtain always a id for each thread even in different device ids
 // @param __have_work Variable to sinalize to each thread that have new work to proccess
@@ -35,6 +54,10 @@ kernel void transaction_request_proccess_kernel(
     // Unique  identification
     unsigned long _unique_id = get_global_id( 0 ) + __global_offset;
 
+    // Transaction request data for this specific thread
+    void* _transaction_request_data = 
+        ( void* ) *( __work_data + _unique_id );
+
     // Infity loop to always proccess new transactions
     while( 1 ) {
 
@@ -45,9 +68,10 @@ kernel void transaction_request_proccess_kernel(
         );
 
         // Proccesses the Transaction Request Data
-        if ( proccess_transaction_request( ( void* ) *( __work_data + _unique_id ) ) ) {
+        if ( proccess_transaction_request( _transaction_request_data ) ) {
 
-            // If transaction is valid
+            // If transaction is valid adds it into the pool
+            store_transaction_data( _transaction_request_data, __pool, __pool_transactions_count );
 
         }
 
